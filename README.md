@@ -93,6 +93,10 @@ download:
             "String": "Hello World"
         };
         editor.set(json);
+        /* listen for events on the tree */
+        editor.bind(function(evt) { 
+          console.log('Event: ' + evt.type + ' Path:' + evt.jsonPath + ' Node:' + evt.jsonNode);
+        });
 
         // get json
         var json = editor.get();
