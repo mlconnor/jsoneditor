@@ -28,7 +28,7 @@
  *
  * @author  Jos de Jong, <wjosdejong@gmail.com>
  * @version 2.3.6
- * @date    2014-01-03
+ * @date    2014-06-02
  */
 (function () {
 
@@ -304,6 +304,7 @@ TreeEditor.prototype._create = function (container, options, json) {
   this.dom = {};
   this.highlighter = new Highlighter();
   this.selection = undefined; // will hold the last input selection
+  this.listeners = [];
 
   this._setOptions(options);
 
@@ -315,7 +316,6 @@ TreeEditor.prototype._create = function (container, options, json) {
   this._createTable();
 
   this.set(json || {});
-  this.listeners = [];
 };
 
 /**
@@ -895,9 +895,7 @@ TreeEditor.prototype._onEvent = function (event) {
     TreeEditor.domFocus = target;
   }
 
-  //console.log('TARGET=', target, target.node, target.parentNode);
   var node = Node.getNodeFromTarget(target);
-  //console.log('node', node);
 
   if ( typeof node != 'undefined' ) {
     event.jsonNode = node;
@@ -914,7 +912,8 @@ TreeEditor.prototype._onEvent = function (event) {
     }
     var pathStr = "";
     for ( var i = 0; i < stack.length; i++ ) {
-      pathStr += getType(stack[i]) == 'number' ? "[" + stack[i] + "]" : pathStr.length == 0 ? stack[i] : "." + stack[i];
+      var pathType = ({}).toString.call(stack[i]).match(/\s([a-zA-Z]+)/)[1].toLowerCase();
+      pathStr += pathType == 'number' ? "[" + stack[i] + "]" : pathStr.length == 0 ? stack[i] : "." + stack[i];
     } 
     //console.log('path=' + pathStr);
     //this.options.bind(pathStr);
@@ -1061,8 +1060,6 @@ JSONEditor.modes.viewer = {
  *                                                         spaces. 4 by default.
  *                                   {function} change     Callback method
  *                                                         triggered on change
- *                                   {function} bind       Callback method
- *                                                         triggered on all events
  * @param {JSON | String} [json]     initial contents of the formatter
  */
 function TextEditor(container, options, json) {
@@ -2506,7 +2503,6 @@ Node.prototype.getDom = function() {
 
   // create row
   dom.tr = document.createElement('tr');
-  //dom.tr.className = 'hello_world';//var att=document.createAttribute("class");
   dom.tr.node = this;
 
   if (this.editor.mode.edit) {
@@ -3068,8 +3064,6 @@ Node.prototype.onEvent = function (event) {
       focusNode,
       expandable = this._hasChilds();
 
-
-
   // check if mouse is on menu or on dragarea.
   // If so, highlight current row and its childs
   if (target == dom.drag || target == dom.menu) {
@@ -3241,17 +3235,6 @@ Node.prototype.onEvent = function (event) {
     this.onKeyDown(event);
   }
 };
-
-/**
- * Returns the type of the argument
- * @param {Any}    val    Value to be tested
- * @returns    {String}    type name for argument
- */
-function getType (val) {
-    if (typeof val === 'undefined') return 'undefined';
-    if (typeof val === 'object' && !val) return 'null';
-    return ({}).toString.call(val).match(/\s([a-zA-Z]+)/)[1].toLowerCase();
-}
 
 /**
  * Key down event handler
@@ -3907,13 +3890,6 @@ Node.prototype.showContextMenu = function (anchor, onClose) {
   var titles = Node.TYPE_TITLES;
   var items = [];
 
-/*
-  var nodeInfo = {
-    leaf : this._hasChilds(),
-    parentHasChildren : this.parent && this.parent._hasChilds(), 
-    lastChild : this.parent && this.parent._hasChilds() && this.parent.childs[this.parent.childs.length - 1] == this
-  };
-*/
   items.push({
     'text': 'Type',
     'title': 'Change the type of this field',
@@ -3993,7 +3969,7 @@ Node.prototype.showContextMenu = function (anchor, onClose) {
     items.push({
       'type': 'separator'
     });
-//MLC
+
     // create append button (for last child node only)
     var childs = node.parent.childs;
     if (node == childs[childs.length - 1]) {
@@ -4082,14 +4058,6 @@ Node.prototype.showContextMenu = function (anchor, onClose) {
           'title': titles.string,
           'click': function () {
             node._onInsertBefore('', '', 'string');
-          }
-        },
-        {
-          'text': 'client_key',
-          'className': 'type-object',
-          'title': 'client_key',
-          'click': function () {
-            node._onInsertBefore('client_key', {});
           }
         }
       ]

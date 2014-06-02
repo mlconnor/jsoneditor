@@ -191,6 +191,25 @@ JSONEditor.prototype.setMode = function (mode) {
 };
 
 /**
+ * Add an event listener
+ */
+JSONEditor.prototype.bind = function(listener) {
+  if ( this.listeners.indexOf(listener) == -1 ) {
+    this.listeners.push(listener);
+  }
+};
+
+/**
+ * Remove a previously registered event listener
+ */
+JSONEditor.prototype.unbind = function(listener) {
+  var index = this.listeners.indexOf(listener);
+  if ( index != -1 ) {
+    this.listeners.splice(index,1);
+  }
+};
+
+/**
  * Throw an error. If an error callback is configured in options.error, this
  * callback will be invoked. Else, a regular error is thrown.
  * @param {Error} err

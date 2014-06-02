@@ -37,6 +37,7 @@ TreeEditor.prototype._create = function (container, options, json) {
   this.dom = {};
   this.highlighter = new Highlighter();
   this.selection = undefined; // will hold the last input selection
+  this.listeners = [];
 
   this._setOptions(options);
 
@@ -628,6 +629,33 @@ TreeEditor.prototype._onEvent = function (event) {
   }
 
   var node = Node.getNodeFromTarget(target);
+
+  if ( typeof node != 'undefined' ) {
+    event.jsonNode = node;
+    var stack = [];
+    var current = node;
+    while ( typeof current != 'undefined' ) {
+	/*console.log(current);*/
+      if ( typeof current.field != 'undefined' ) {
+        stack.unshift(current.field);
+      } else if ( typeof current.index != 'undefined' ) {
+        stack.unshift(current.index);
+      }
+      current = current.parent;
+    }
+    var pathStr = "";
+    for ( var i = 0; i < stack.length; i++ ) {
+      var pathType = ({}).toString.call(stack[i]).match(/\s([a-zA-Z]+)/)[1].toLowerCase();
+      pathStr += pathType == 'number' ? "[" + stack[i] + "]" : pathStr.length == 0 ? stack[i] : "." + stack[i];
+    } 
+    //console.log('path=' + pathStr);
+    //this.options.bind(pathStr);
+    event.jsonPath = pathStr;
+  }
+  for ( var i = 0; i < this.listeners.length; i++ ) {
+    this.listeners[i](event);
+  }
+
   if (node) {
     node.onEvent(event);
   }
