@@ -885,7 +885,6 @@ TreeEditor.prototype._onRedo = function () {
  * @private
  */
 TreeEditor.prototype._onEvent = function (event) {
-  console.log('TreeEditor _onEvent, type=' + event.type);
   var target = event.target;
 
   if (event.type == 'keydown') {
