@@ -8,12 +8,12 @@
     "viewer",
     "formatter"
   ],
-  "homepage": "http://jsoneditoronline.org/",
+  "homepage": "https://github.com/mlconnor/jsoneditor",
   "repository": {
     "type": "git",
-    "url": "https://github.com/josdejong/jsoneditor.git"
+    "url": "https://github.com/mlconor/jsoneditor.git"
   },
-  "bugs": "https://github.com/josdejong/jsoneditor/issues",
+  "bugs": "https://github.com/mlconnor/jsoneditor/issues",
   "ignore": [
     "app",
     "build",
